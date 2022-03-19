@@ -1,0 +1,10 @@
+
+package:
+  name: pyrctgen
+  version: 0.0.1
+
+  dev-deps:
+    - name: pyvsc
+      url: https://github.com/fvutils/pyvsc.git
+      branch: vsc2
+
