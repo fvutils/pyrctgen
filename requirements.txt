@@ -1,8 +1,5 @@
 
 Sphinx
     sphinx-argparse
-    sphinxcontrib-makedomain
-    sphinxcontrib-openapi
     sphinxcontrib-spelling
     sphinx-rtd-theme
-    sphinx-jsonschema
