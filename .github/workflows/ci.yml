@@ -16,7 +16,7 @@ jobs:
       run: |
         # Install dependencies required to load ivpm.yaml file
         mkdir -p packages
-        python3 -m venv package/python
+        python3 -m venv packages/python
         ./packages/python/bin/pip install -r requirements.txt
         #        python3 -m pip install pyyaml pyyaml-srcinfo-loader toposort requirements-parser
         #        export PYTHONPATH=./src
