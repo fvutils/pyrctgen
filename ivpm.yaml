@@ -1,10 +1,34 @@
 
 package:
   name: pyrctgen
-  version: 0.0.1
 
-  dev-deps:
+  dep-sets:
+
+  - name: default
+    deps: []
+
+  - name: default-dev
+    deps:
+    - name: dataclasses
+      src: pypi
     - name: pyvsc
       url: https://github.com/fvutils/pyvsc.git
       branch: vsc2
+    - name: libarl
+      url: https://github.com/fvutils/libarl.git
+    - name: Sphinx
+      src: pypi
+    - name: sphinx-argparse
+      src: pypi
+    - name: sphinxcontrib-makedomain
+      src: pypi
+    - name: sphinxcontrib-openapi
+      src: pypi
+    - name: sphinxcontrib-spelling
+      src: pypi
+    - name: sphinx-rtd-theme
+      src: pypi
+    - name: sphinx-jsonschema
+      src: pypi
+
 

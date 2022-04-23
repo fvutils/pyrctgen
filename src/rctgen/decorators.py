@@ -8,20 +8,35 @@ from rctgen.impl.exec_decorator_impl import ExecDecoratorImpl
 from rctgen.impl.exec_kind_e import ExecKindE
 from rctgen.impl.struct_decorator_impl import StructDecoratorImpl
 from rctgen.impl.struct_kind_e import StructKindE
+from rctgen.impl.component_decorator_impl import ComponentDecoratorImpl
+from rctgen.impl.activity_decorator_impl import ActivityDecoratorImpl
+from rctgen.impl.type_kind_e import TypeKindE
 
 def action(*args, **kwargs): 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        # No-argument form
-        return ActionDecoratorImpl({})(args[0])
+        if hasattr(args[0], "_typeinfo") and args[0]._typeinfo.kind == TypeKindE.Component:
+            # Argument form with the parameter being the context class
+            return ActionDecoratorImpl(args, kwargs)
+        else:
+            # No-argument form
+            return ActionDecoratorImpl([], {})(args[0])
     else:
-        return ActionDecoratorImpl(kwargs)
+        # Argument form
+        return ActionDecoratorImpl(args, kwargs)
     
 def activity(*args, **kwargs):
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
         # No-argument form
-        return ActionDecoratorImpl({})(args[0])
+        return ActivityDecoratorImpl({})(args[0])
     else:
-        return ActionDecoratorImpl(kwargs)
+        return ActivityDecoratorImpl(kwargs)
+    
+def component(*args, **kwargs):
+    if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+        # No-argument form
+        return ComponentDecoratorImpl({})(args[0])
+    else:
+        return ComponentDecoratorImpl(kwargs)
     
 def buffer(*args, **kwargs): 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):

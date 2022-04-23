@@ -10,5 +10,5 @@ class ActivityDecoratorImpl(object):
         pass
     
     def __call__(self, T):
-        pass
+        return T
         
