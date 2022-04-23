@@ -15,7 +15,9 @@ jobs:
     - name: Configure Python
       run: |
         # Install dependencies required to load ivpm.yaml file
-        echo "placholder"
+        mkdir -p packages
+        python3 -m venv package/python
+        ./packages/python/bin/pip install -r requirements.txt
         #        python3 -m pip install pyyaml pyyaml-srcinfo-loader toposort requirements-parser
         #        export PYTHONPATH=./src
         #        python3 -m ivpm update
@@ -25,9 +27,8 @@ jobs:
 
     - name: Build Docs
       run: |
-        echo "placeholder"
-        #        ./packages/python/bin/sphinx-build -M html ./doc/source build
-        #        touch build/html/.nojekyll
+        ./packages/python/bin/sphinx-build -M html ./doc/source build
+        touch build/html/.nojekyll
 
         #    - name: Publish to PyPi
         #      if: startsWith(github.ref, 'refs/heads/master')
@@ -37,7 +38,7 @@ jobs:
         #        password: ${{ secrets.PYPI_API_TOKEN }}
 
     - name: Publish Docs
-      if: startsWith(github.ref, 'refs/heads/master')
+      if: startsWith(github.ref, 'refs/heads/main')
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
         branch: gh-pages
