@@ -18,12 +18,6 @@ def presolve(T):
 
 class TestActionSmoke(TestBase):
     
-    arl = core.Arl.inst()
-    
-    ctx = arl.mkContext()
-    
-    print("ctx=%s" % str(ctx))
-    
     def test_smoke(self):
         import rctgen as rg
         
@@ -32,6 +26,11 @@ class TestActionSmoke(TestBase):
 
         @rg.component            
         class MyComponent:
+            
+            @rg.exec.init_down
+            def init_down(self):
+                print("init_down")
+                
             pass
         
         @rg.action(MyComponent)

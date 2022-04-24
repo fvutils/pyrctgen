@@ -17,3 +17,7 @@ class ExecType(object):
     @kind.setter
     def kind(self, k):
         self._kind = k
+
+    @property
+    def func(self):
+        return self._f

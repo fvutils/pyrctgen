@@ -83,6 +83,22 @@ class exec(object):
             return ExecDecoratorImpl(ExecKindE.Body, kwargs)
         
     @staticmethod
+    def init_down(*args, **kwargs):
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            # No-argument form
+            return ExecDecoratorImpl(ExecKindE.InitDown, {})(args[0])
+        else:
+            return ExecDecoratorImpl(ExecKindE.InitDown, kwargs)
+        
+    @staticmethod
+    def init_up(*args, **kwargs):
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            # No-argument form
+            return ExecDecoratorImpl(ExecKindE.InitUp, {})(args[0])
+        else:
+            return ExecDecoratorImpl(ExecKindE.InitUp, kwargs)
+        
+    @staticmethod
     def pre_solve(*args, **kwargs):
         if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
             # No-argument form
