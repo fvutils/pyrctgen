@@ -13,13 +13,25 @@ from rctgen.impl.exec_kind_e import ExecKindE
 class ComponentDecoratorImpl(DecoratorImplBase):
 
     def __init__(self, kwargs):
+        super().__init__(TypeKindE.Component)
         pass
     
     def __call__(self, T):
-        setattr(T, "_typeinfo", TypeInfo(TypeKindE.Component))
+        Tp = super().__call__(T)
+        
         ComponentImpl.add_methods(T)
         
-        self.populate_execs(
-            T._typeinfo,
-            (ExecKindE.InitDown, ExecKindE.InitUp))
-        return T
+        return Tp
+    
+    def _validateExec(self, kind):
+        return kind in (ExecKindE.InitDown, ExecKindE.InitUp)
+
+    def _mkLibDataType(self, name, ctxt):
+        ds_t = ctxt.findDataTypeComponent(name)
+        
+        if ds_t is None:
+            ds_t = ctxt.mkDataTypeComponent(name)
+            ctxt.addDataTypeComponent(ds_t)
+        
+        return ds_t
+        
