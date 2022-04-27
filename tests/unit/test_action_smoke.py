@@ -24,8 +24,14 @@ class TestActionSmoke(TestBase):
         def do_print(msg):
             print("Msg: %s" % msg)
 
+        @rg.component
+        class MySubComponent:
+            pass
+        
         @rg.component            
         class MyComponent:
+            val : rg.int8_t
+            sc : MySubComponent
             
             @rg.exec.init_down
             def init_down(self):

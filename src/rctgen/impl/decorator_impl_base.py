@@ -8,6 +8,8 @@ from rctgen.impl.ctor import Ctor
 from rctgen.impl.type_info import TypeInfo
 from rctgen.impl.type_kind_e import TypeKindE
 from rctgen.impl.exec_group import ExecGroup
+from rctgen.impl.rand_t import RandT
+from rctgen.impl.scalar_t import ScalarT
 
 
 class DecoratorImplBase(object):
@@ -23,13 +25,15 @@ class DecoratorImplBase(object):
     def __call__(self, T):
         ctor = Ctor.inst()
 
-        Tp = dataclasses.dataclass(T)
+        Tp = dataclasses.dataclass(T, init=False)
 
         ds_t = self._mkLibDataType(T.__qualname__, ctor.ctxt())
         ti = self._mkTypeInfo(self._kind)
         
         setattr(T, "_typeinfo", ti)
         ti.lib_obj = ds_t
+        
+        self._populateFields(ti, Tp)
 
         #************************************************************        
         #* Populate constraints from this type and base types
@@ -72,11 +76,31 @@ class DecoratorImplBase(object):
     def _validateExec(self, kind):
         return True
     
+    def _validateField(self, name, type, is_rand):
+        return True
+    
     def _mkTypeInfo(self, kind : TypeKindE):
         return TypeInfo(kind)
     
     def _mkLibDataType(self, name, ctxt):
         raise NotImplementedError("_mkLibDataType not implemented for %s" % str(type(self)))
+    
+    def _populateFields(self, ti, T):
+        for f in dataclasses.fields(T):
+            
+            is_rand = False
+            t = f.type
+            if issubclass(t, RandT):
+                t = t.T
+                is_rand = True
+                
+            if issubclass(t, ScalarT):
+                print("Scalar: %d" % t.W)
+            elif hasattr(t, "_typeinfo"):
+                print("Has TypeInfo")
+                
+            print("Field: %s" % str(f))
+        pass
     
     def _populateExecs(self, ti, T):
         T_ti = T._typeinfo
