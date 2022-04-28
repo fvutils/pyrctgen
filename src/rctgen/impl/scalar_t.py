@@ -6,6 +6,7 @@ Created on Apr 26, 2022
 
 from .field_scalar_impl import FieldScalarImpl
 from .ctor import Ctor
+from rctgen.impl.ctor_scope import CtorScope
 
 class ScalarT(FieldScalarImpl):
     W = 0
@@ -37,8 +38,14 @@ class ScalarT(FieldScalarImpl):
         super().__init__(name, lib_field, type(self).S)
 
     @classmethod
-    def createField(cls, name, is_rand, iv):
-        print("ScalarT::create %d %d iv=%s" % (cls.W, cls.S, str(iv)))
-        ret = FieldScalarImpl(name, cls.W, cls.S, is_rand, iv)
+    def createField(cls, name):
+        print("ScalarT::create %d %d" % (cls.W, cls.S))
+        ctor = Ctor.inst()
+        s : CtorScope = ctor.scope()
+        ret = FieldScalarImpl(
+            name, 
+            s.lib_scope,
+            cls.S)
+        
         return ret
     

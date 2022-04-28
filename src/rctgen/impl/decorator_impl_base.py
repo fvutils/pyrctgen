@@ -10,6 +10,7 @@ from rctgen.impl.type_kind_e import TypeKindE
 from rctgen.impl.exec_group import ExecGroup
 from rctgen.impl.rand_t import RandT
 from rctgen.impl.scalar_t import ScalarT
+from libvsc import core as vsc
 
 
 class DecoratorImplBase(object):
@@ -85,19 +86,60 @@ class DecoratorImplBase(object):
     def _mkLibDataType(self, name, ctxt):
         raise NotImplementedError("_mkLibDataType not implemented for %s" % str(type(self)))
     
-    def _populateFields(self, ti, T):
+    def _populateFields(self, ti : TypeInfo, T):
         for f in dataclasses.fields(T):
-            
+
+            attr = vsc.ModelFieldFlag.NoFlags
             is_rand = False
+            iv=0
             t = f.type
             if issubclass(t, RandT):
                 t = t.T
+                attr |= vsc.ModelFieldFlag.DeclRand
                 is_rand = True
-                
+
+            ctor = Ctor.inst()
+
+            print("f: %s" % str(f))
+            
+            # The signature of a creation function is:
+            # - name
+            # - is_rand
+            # - idx
             if issubclass(t, ScalarT):
                 print("Scalar: %d" % t.W)
-            elif hasattr(t, "_typeinfo"):
+                lt = ctor.ctxt().findDataTypeInt(t.S, t.W)
+                if lt is None:
+                    lt = ctor.ctxt().mkDataTypeInt(t.S, t.W)
+                    ctor.ctxt().addDataTypeInt(lt)
+
+                iv_m = None
+                
+                if f.default is not dataclasses._MISSING_TYPE:
+                    iv_m = ctor.ctxt().mkModelVal()
+                    iv_m.setBits(t.W)
+                    if t.S:
+                        iv_m.set_val_i(int(f.default))
+                    else:
+                        iv_m.set_val_u(int(f.default))
+                    
+                field_t = ctor.ctxt().mkTypeField(
+                    f.name, 
+                    lt, 
+                    attr,
+                    iv_m)
+                ti.lib_obj.addField(field_t)
+                ti._field_ctor_l.append((f.name, t.createField))
+            elif hasattr(t, "_typeinfo") and isinstance(t._typeinfo, TypeInfo):
+                # This is a field of user-defined type
                 print("Has TypeInfo")
+                field_t = ctor.ctxt().mkTypeField(
+                    f.name, 
+                    t._typeinfo.lib_obj, 
+                    attr,
+                    None)
+                ti.lib_obj.addField(field_t)
+                ti._field_ctor_l.append((f.name, lambda name, t=t: t._createInst(t, name)))
                 
             print("Field: %s" % str(f))
         pass

@@ -3,7 +3,7 @@ Created on Apr 4, 2022
 
 @author: mballance
 '''
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from rctgen.impl.exec_kind_e import ExecKindE
 
 class TypeInfo(object):
@@ -21,6 +21,9 @@ class TypeInfo(object):
         
         # List of constraints
         self._constraint_l = []
+        
+        # Dict
+        self._field_ctor_l : Tuple[str,object] = []
         
     @property
     def kind(self):

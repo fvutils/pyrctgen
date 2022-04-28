@@ -8,9 +8,10 @@ from .ctor import Ctor
 from libarl import core
 from libarl.core import Context
 #from vsc2.impl.expr import Expr
-#from vsc2.impl.field_modelinfo import FieldModelInfo
+from .field_model_info import FieldModelInfo
 
 class FieldScalarImpl(object):
+    """User-facade for scalar fields in the Python facade"""
     
     def __init__(self, name, lib_field, is_signed):
         ctxt : Context = Ctor.inst().ctxt()

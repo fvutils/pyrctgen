@@ -34,17 +34,36 @@ class ComponentImpl(object):
                 # Need to create a new scope
                 if s._type_mode:
                     raise Exception("Should hit in type mode")
+                s = ctor.push_scope(
+                    self,
+                    ctor.ctxt().buildModelComponent(
+                        typeinfo.lib_obj,
+                        type(self).__name__),
+                    False)
                 pass
             pass
         else:
             # Push a new scope, knowing that we're not in type mode
-            model = None # TODO: build from template
-            s = ctor.push_scope(self, model, False)
+            s = ctor.push_scope(
+                self,
+                ctor.ctxt().buildModelComponent(
+                    typeinfo.lib_obj,
+                    type(self).__name__),
+                False)
         
         self._modelinfo = ModelInfo(self, "<>")
         self._modelinfo._lib_obj = s._lib_scope
         
         print("__init__")
+        
+        # Populate the fields
+        for i,fc in enumerate(typeinfo._field_ctor_l):
+            print("Field: %s" % fc[0])
+            ctor.push_scope(None, s.lib_scope.getField(i), False)
+            field_facade = fc[1](fc[0])
+            setattr(self, fc[0], field_facade)
+            ctor.pop_scope()
+            
 
         # Invoke the user-visible constructor        
         base(self, *args, *kwargs)
@@ -83,11 +102,17 @@ class ComponentImpl(object):
             
         pass
     
+    @staticmethod
+    def _createInst(cls, name):
+        ret = cls()
+        return ret
+    
     @classmethod
     def add_methods(cls, T):
         base_init = T.__init__
         setattr(T, "__init__", lambda self, *args, **kwargs: cls.init(
             self, base_init, *args, **kwargs))
         setattr(T, "_runInitSeq", cls._runInitSeq)
+        setattr(T, "_createInst", cls._createInst)
         setattr(T, "eval", cls.eval)
         

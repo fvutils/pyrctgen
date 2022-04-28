@@ -26,11 +26,16 @@ class TestActionSmoke(TestBase):
 
         @rg.component
         class MySubComponent:
+            v : rg.int8_t = 3
+            
+            @rg.exec.init_down
+            def init_down(self):
+                print("MySubComponent::init_down: %d" % self.v)
             pass
         
         @rg.component            
         class MyComponent:
-            val : rg.int8_t
+            val : rg.int8_t = 2
             sc : MySubComponent
             
             @rg.exec.init_down
