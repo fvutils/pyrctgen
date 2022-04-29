@@ -31,6 +31,8 @@ class TestActionSmoke(TestBase):
             @rg.exec.init_down
             def init_down(self):
                 print("MySubComponent::init_down: %d" % self.v)
+                self.v = 7
+                print("MySubComponent::init_down: %d" % self.v)
             pass
         
         @rg.component            

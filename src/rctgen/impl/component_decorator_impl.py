@@ -19,7 +19,7 @@ class ComponentDecoratorImpl(DecoratorImplBase):
     def __call__(self, T):
         Tp = super().__call__(T)
         
-        ComponentImpl.add_methods(T)
+        ComponentImpl.addMethods(T)
         
         return Tp
     

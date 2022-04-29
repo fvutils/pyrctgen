@@ -9,8 +9,9 @@ from rctgen.impl.type_info import TypeInfo
 from rctgen.impl.exec_kind_e import ExecKindE
 from rctgen.impl.exec_group import ExecGroup
 from rctgen.impl.rt_ctxt import RtCtxt
+from rctgen.impl.impl_base import ImplBase
 
-class ComponentImpl(object):
+class ComponentImpl(ImplBase):
     """Methods added to Component-decorated classes"""
     
     @staticmethod
@@ -108,7 +109,8 @@ class ComponentImpl(object):
         return ret
     
     @classmethod
-    def add_methods(cls, T):
+    def addMethods(cls, T):
+        ImplBase.addMethods(T)
         base_init = T.__init__
         setattr(T, "__init__", lambda self, *args, **kwargs: cls.init(
             self, base_init, *args, **kwargs))
