@@ -19,7 +19,7 @@ class ActionDecoratorImpl(DecoratorImplBase):
     
     def __call__(self, T):
         
-        ActionImpl.add_methods(T)
+        ActionImpl.addMethods(T)
 
         component_t = None        
         if len(self._args) != 0:
@@ -48,10 +48,11 @@ class ActionDecoratorImpl(DecoratorImplBase):
             
         return Tp
    
-    def _mkLibDataType(self, name, ctxt):
+    def _mkLibDataType(self, T, name, ctxt):
         ds_t = ctxt.findDataTypeAction(name)
         if ds_t is None:
             ds_t = ctxt.mkDataTypeAction(name)
+            ds_t.setCreateHook(lambda obj: ActionImpl._createHook(T, obj))
             ctxt.addDataTypeAction(ds_t)
         return ds_t
     

@@ -28,7 +28,7 @@ class DecoratorImplBase(object):
 
         Tp = dataclasses.dataclass(T, init=False)
 
-        ds_t = self._mkLibDataType(T.__qualname__, ctor.ctxt())
+        ds_t = self._mkLibDataType(T, T.__qualname__, ctor.ctxt())
         ti = self._mkTypeInfo(self._kind)
         
         setattr(T, "_typeinfo", ti)
@@ -83,7 +83,7 @@ class DecoratorImplBase(object):
     def _mkTypeInfo(self, kind : TypeKindE):
         return TypeInfo(kind)
     
-    def _mkLibDataType(self, name, ctxt):
+    def _mkLibDataType(self, T, name, ctxt):
         raise NotImplementedError("_mkLibDataType not implemented for %s" % str(type(self)))
     
     def _populateFields(self, ti : TypeInfo, T):

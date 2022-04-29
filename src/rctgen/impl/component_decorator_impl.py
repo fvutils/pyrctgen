@@ -26,7 +26,7 @@ class ComponentDecoratorImpl(DecoratorImplBase):
     def _validateExec(self, kind):
         return kind in (ExecKindE.InitDown, ExecKindE.InitUp)
 
-    def _mkLibDataType(self, name, ctxt):
+    def _mkLibDataType(self, T, name, ctxt):
         ds_t = ctxt.findDataTypeComponent(name)
         
         if ds_t is None:

@@ -17,6 +17,11 @@ class ComponentImpl(ImplBase):
     @staticmethod
     async def eval(self, action_t):
         print("ComponentImpl.eval")
+        ctor = Ctor.inst()
+        ev = ctor.ctxt().mkModelEvaluator()
+        it = ev.eval(
+            self._modelinfo._lib_obj,
+            action_t._typeinfo._lib_obj)
         
     @staticmethod
     def init(self, base, *args, **kwargs):
