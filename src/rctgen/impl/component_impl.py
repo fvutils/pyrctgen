@@ -3,6 +3,7 @@ Created on Apr 4, 2022
 
 @author: mballance
 '''
+from libarl import core
 from rctgen.impl.ctor import Ctor
 from rctgen.impl.model_info import ModelInfo
 from rctgen.impl.type_info import TypeInfo
@@ -22,6 +23,23 @@ class ComponentImpl(ImplBase):
         it = ev.eval(
             self._modelinfo._lib_obj,
             action_t._typeinfo._lib_obj)
+
+        print("Iterating...")        
+        while it.next():
+            if it.type() == core.ModelEvalNodeT.Action:
+                action_field = it.action()
+                action = action_field.getFieldData()
+                await action._evalExecTarget(ExecKindE.Body)
+            
+                print("Action: %s" % str(action))
+            elif it.type() == core.ModelEvalNodeT.Parallel:
+                # Create a coroutine for each branch
+                # Wait for coroutines to complete
+                pass
+            elif it.type() == core.ModelEvalNodeT.Sequence:
+                # Iterate through each item and dispatch
+                pass
+            print("type: %s" % str(it.type()))
         
     @staticmethod
     def init(self, base, *args, **kwargs):

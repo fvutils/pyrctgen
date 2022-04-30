@@ -20,6 +20,7 @@ class ActionImpl(ImplBase):
             if s.facade_obj is None:
                 # The field-based caller has created a frame for us
                 s.facade_obj = self
+                s.lib_scope.setFieldData(self)
             elif s.facade_obj is self:
                 s.inc_inh_depth()
             else:
@@ -32,8 +33,7 @@ class ActionImpl(ImplBase):
                         typeinfo.lib_obj,
                         type(self).__name__),
                     False)
-                pass
-            pass
+                s.lib_scope.setFieldData(self)
         else:
             # Push a new scope, knowing that we're not in type mode
             s = ctor.push_scope(
@@ -42,6 +42,9 @@ class ActionImpl(ImplBase):
                     typeinfo.lib_obj,
                     type(self).__name__),
                 False)
+            s.lib_scope.setFieldData(self)
+            
+        print("field_data: %s" % str(s.lib_scope.getFieldData()))
         
         self._modelinfo = ModelInfo(self, "<>")
         self._modelinfo._lib_obj = s._lib_scope
@@ -78,4 +81,4 @@ class ActionImpl(ImplBase):
         setattr(T, "__super_init__", getattr(T, "__init__"))
         setattr(T, "__init__", lambda self, *args, **kwargs: cls.init(
             self, base_init, *args, **kwargs))
-        pass
+

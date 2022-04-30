@@ -5,6 +5,7 @@ Created on Apr 4, 2022
 '''
 from typing import Dict, List, Tuple
 from rctgen.impl.exec_kind_e import ExecKindE
+from rctgen.impl.exec_group import ExecGroup
 
 class TypeInfo(object):
     
@@ -17,7 +18,7 @@ class TypeInfo(object):
         self._ctxt_t = None
 
         # Dict of exec kind to list of exec blocks
-        self._exec_m : Dict[ExecKindE,List] = {}
+        self._exec_m : Dict[ExecKindE,ExecGroup] = {}
         
         # List of constraints
         self._constraint_l = []

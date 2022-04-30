@@ -47,12 +47,21 @@ class TestActionSmoke(TestBase):
             pass
         
         @rg.action(MyComponent)
+        class MyBaseAction(object):
+            
+            @rg.exec.body
+            async def body(self):
+                nonlocal do_print
+                do_print("Hello Base")
+        
+        @rg.action(MyComponent)
         class MyAction(object):
             
             @rg.exec.body
             async def body(self):
                 nonlocal do_print
                 do_print("Hello")
+                await self.super()
 
         root_c = MyComponent()
         asyncio.run(root_c.eval(MyAction))                
