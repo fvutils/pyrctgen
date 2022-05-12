@@ -51,6 +51,8 @@ class ActionImpl(ImplBase):
         
         print("__init__")
         
+        # Add built-in 'comp' field
+        
         # Populate the fields
         for i,fc in enumerate(typeinfo._field_ctor_l):
             print("Field: %s" % fc[0])

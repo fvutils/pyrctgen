@@ -6,6 +6,7 @@ Created on Mar 19, 2022
 from test_base import TestBase
 from libarl import core
 import asyncio
+import rctgen as rg
 
 functions = []
 def presolve(T):
@@ -19,7 +20,6 @@ def presolve(T):
 class TestActionSmoke(TestBase):
     
     def test_smoke(self):
-        import rctgen as rg
         
         def do_print(msg):
             print("Msg: %s" % msg)
@@ -129,5 +129,31 @@ class TestActionSmoke(TestBase):
         a = my_action()
         a.activity()
         
+    def test_activity_basics(self):
         
+        @rg.component
+        class MyComponent(object):
+            pass
+        
+        @rg.action(MyComponent)
+        class SayHello(object):
+            
+            @rg.exec.body
+            async def body(self):
+                print("Hello")
+        
+        @rg.action(MyComponent)
+        class MyAction(object):
+            
+            @rg.activity
+            def activity(self):
+                rg.do[SayHello]
+                with rg.do_with[SayHello] as it:
+                    pass
+                    
+                pass
+            
+        a = MyAction()
+        a.activity()
+            
         

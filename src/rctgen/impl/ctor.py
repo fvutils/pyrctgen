@@ -15,10 +15,15 @@ class Ctor(object):
         self._exec_type_l = []
         self._ctxt = core.Arl.inst().mkContext()
         self._scope_s = []
+        self._activity_l = []
+        self._activity_scope_s = []
         self._constraint_l = []
         self._constraint_s = []
         self._expr_s = []
-        self._expr_mode_s = []        
+        self._expr_mode_s = []
+ 
+        self._component_typeinfo_m = {}
+        self._action_typeinfo_m = {}       
 
         pass
     
@@ -62,6 +67,23 @@ class Ctor(object):
         
     def pop_expr_mode(self):
         return self._expr_mode_s.pop()
+    
+    def push_activity_decl(self, a):
+        self._activity_l.append(a)
+    
+    def pop_activity_decl(self):
+        ret = self._activity_l.copy()
+        self._activity_l.clear()
+        return ret
+    
+    def push_activity_scope(self, s):
+        pass
+    
+    def pop_activity_scope(self):
+        pass
+    
+    def add_activity_item(self, it):
+        pass
         
     def push_constraint_decl(self, c):
         self._constraint_l.append(c)
@@ -98,6 +120,12 @@ class Ctor(object):
         ret = self._exec_type_l.copy()
         self._exec_type_l.clear()
         return ret
+    
+    def add_component_typeinfo(self, T, typeinfo):
+        self._component_typeinfo_m[T] = typeinfo
+        
+    def add_action_typeinfo(self, T, typeinfo):
+        self._action_typeinfo_m[T] = typeinfo
     
     @classmethod
     def inst(cls):

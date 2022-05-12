@@ -23,7 +23,7 @@ class StructDecoratorImpl(DecoratorImplBase):
     def _validateExec(self, kind):
         return kind in [ExecKindE.PreSolve, ExecKindE.PostSolve]
     
-    def _mkLibDataType(self, name, ctxt):
+    def _mkLibDataType(self, T, name, ctxt):
         ds_t = ctxt.findDataTypeStruct(name)
         
         if ds_t is None:

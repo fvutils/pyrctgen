@@ -8,6 +8,8 @@ from rctgen.impl.type_kind_e import TypeKindE
 from rctgen.impl.decorator_impl_base import DecoratorImplBase
 from rctgen.impl.action_impl import ActionImpl
 from rctgen.impl.exec_kind_e import ExecKindE
+from rctgen.impl.ctor import Ctor
+from rctgen.impl.type_info_action import TypeInfoAction
 
 class ActionDecoratorImpl(DecoratorImplBase):
     
@@ -18,6 +20,7 @@ class ActionDecoratorImpl(DecoratorImplBase):
         pass
     
     def __call__(self, T):
+        ctor = Ctor.inst()
         
         ActionImpl.addMethods(T)
 
@@ -43,10 +46,22 @@ class ActionDecoratorImpl(DecoratorImplBase):
         Tp = super().__call__(T)
             
         self.populate_execs(
-            T._typeinfo,
+            Tp._typeinfo,
             (ExecKindE.PreSolve, ExecKindE.PostSolve, ExecKindE.Body))
-            
+        
+        for a in ctor.pop_activity_decl():
+            Tp._typeinfo.addActivityDecl(a)
+        
+#        self.populate_activities(Tp._typeinfo)
+        
+        # Build out the type model associated with this type
+        
+        Ctor.inst().add_action_typeinfo(Tp, Tp._typeinfo)
+        
         return Tp
+    
+    def _mkTypeInfo(self, kind : TypeKindE):
+        return TypeInfoAction()
    
     def _mkLibDataType(self, T, name, ctxt):
         ds_t = ctxt.findDataTypeAction(name)
