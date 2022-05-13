@@ -19,6 +19,11 @@ class TestPoolSmoke(TestBase):
         class PssTop(object):
             channels : rg.pool[MyResource] = rg.pool.size(2)
             
+            @rg.exec.init_down
+            def init_down(self):
+                print("PssTop::init")
+                self.channels.size = 20
+            
         pss_top = PssTop()
             
         

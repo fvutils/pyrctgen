@@ -95,7 +95,6 @@ class ComponentImpl(ImplBase):
         if s.dec_inh_depth() == 0:
             if not ctor.is_type_mode():
                 # Run the init sequence
-                print("TODO: run init sequence") 
                 self._runInitSeq()
         
         pass

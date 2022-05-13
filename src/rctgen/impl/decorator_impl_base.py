@@ -11,6 +11,7 @@ from rctgen.impl.exec_group import ExecGroup
 from rctgen.impl.rand_t import RandT
 from rctgen.impl.scalar_t import ScalarT
 from libvsc import core as vsc
+from rctgen.impl.pool_t import PoolT
 
 
 class DecoratorImplBase(object):
@@ -130,6 +131,24 @@ class DecoratorImplBase(object):
                     iv_m)
                 ti.lib_obj.addField(field_t)
                 ti._field_ctor_l.append((f.name, t.createField))
+            elif issubclass(t, PoolT):
+                decl_size = -1
+                
+                pool_t = None
+                
+                if f.default is not dataclasses._MISSING_TYPE:
+                    decl_size = int(f.default)
+                
+                field_t = ctor.ctxt().mkTypeFieldPool(
+                    f.name,
+                    pool_t,
+                    attr,
+                    decl_size)
+
+                ti.lib_obj.addField(field_t)
+                ti._field_ctor_l.append((f.name, t.createField))
+                                
+                print("TODO: pool")
             elif hasattr(t, "_typeinfo") and isinstance(t._typeinfo, TypeInfo):
                 # This is a field of user-defined type
                 print("Has TypeInfo")
