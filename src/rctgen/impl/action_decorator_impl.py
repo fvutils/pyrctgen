@@ -55,7 +55,8 @@ class ActionDecoratorImpl(DecoratorImplBase):
 #        self.populate_activities(Tp._typeinfo)
         
         # Build out the type model associated with this type
-        
+
+#        ctor.push_action_decl(Tp)
         Ctor.inst().add_action_typeinfo(Tp, Tp._typeinfo)
         
         return Tp

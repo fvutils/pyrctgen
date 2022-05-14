@@ -15,6 +15,7 @@ class Ctor(object):
         self._exec_type_l = []
         self._ctxt = core.Arl.inst().mkContext()
         self._scope_s = []
+        self._action_decl_l = []
         self._activity_l = []
         self._activity_scope_s = []
         self._constraint_l = []
@@ -67,6 +68,9 @@ class Ctor(object):
         
     def pop_expr_mode(self):
         return self._expr_mode_s.pop()
+    
+    def push_action_decl(self, Ta):
+        self._action_decl_l.append(Ta)
     
     def push_activity_decl(self, a):
         self._activity_l.append(a)
@@ -126,6 +130,10 @@ class Ctor(object):
         
     def add_action_typeinfo(self, T, typeinfo):
         self._action_typeinfo_m[T] = typeinfo
+        
+    def finalize(self):
+        """Perform final setup setps"""
+        pass
     
     @classmethod
     def inst(cls):

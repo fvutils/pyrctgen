@@ -12,6 +12,8 @@ from rctgen.impl.rand_t import RandT
 from rctgen.impl.scalar_t import ScalarT
 from libvsc import core as vsc
 from rctgen.impl.pool_t import PoolT
+from rctgen.impl.struct_kind_e import StructKindE
+from rctgen.impl.lock_share_t import LockShareT
 
 
 class DecoratorImplBase(object):
@@ -108,47 +110,12 @@ class DecoratorImplBase(object):
             # - is_rand
             # - idx
             if issubclass(t, ScalarT):
-                print("Scalar: %d" % t.W)
-                lt = ctor.ctxt().findDataTypeInt(t.S, t.W)
-                if lt is None:
-                    lt = ctor.ctxt().mkDataTypeInt(t.S, t.W)
-                    ctor.ctxt().addDataTypeInt(lt)
-
-                iv_m = None
-                
-                if f.default is not dataclasses._MISSING_TYPE:
-                    iv_m = ctor.ctxt().mkModelVal()
-                    iv_m.setBits(t.W)
-                    if t.S:
-                        iv_m.set_val_i(int(f.default))
-                    else:
-                        iv_m.set_val_u(int(f.default))
-                    
-                field_t = ctor.ctxt().mkTypeField(
-                    f.name, 
-                    lt, 
-                    attr,
-                    iv_m)
-                ti.lib_obj.addField(field_t)
-                ti._field_ctor_l.append((f.name, t.createField))
+                self._processFieldScalar(ti, f, attr, t)
             elif issubclass(t, PoolT):
-                decl_size = -1
-                
-                pool_t = None
-                
-                if f.default is not dataclasses._MISSING_TYPE:
-                    decl_size = int(f.default)
-                
-                field_t = ctor.ctxt().mkTypeFieldPool(
-                    f.name,
-                    pool_t,
-                    attr,
-                    decl_size)
-
-                ti.lib_obj.addField(field_t)
-                ti._field_ctor_l.append((f.name, t.createField))
-                                
-                print("TODO: pool")
+                self._processFieldPool(ti, f, attr, t)
+            elif issubclass(t, LockShareT):
+                print("LockShare!")
+                self._processFieldLockShare(ti, f, attr, t)
             elif hasattr(t, "_typeinfo") and isinstance(t._typeinfo, TypeInfo):
                 # This is a field of user-defined type
                 print("Has TypeInfo")
@@ -162,6 +129,80 @@ class DecoratorImplBase(object):
                 
             print("Field: %s" % str(f))
         pass
+    
+    def _processFieldLockShare(self, ti, f, attr, t):
+        ctor = Ctor.inst()
+        
+        if hasattr(t.T, "_typeinfo"):
+            print("Kind: %s" % str(t.T._typeinfo._kind))
+            claim_t = t.T._typeinfo.lib_obj
+        else:
+            raise Exception("Type %s is not a PyRctGen type" % t.T.__qualname__)
+        
+        if f.default is not dataclasses.MISSING:
+            print("default: %s" % str(f.default))
+            raise Exception("Lock/Share fields cannot be assigned a value")
+        
+        field_t = ctor.ctxt().mkTypeFieldClaim(
+            f.name,
+            claim_t,
+            t.IsLock)
+
+        ti.lib_obj.addField(field_t)
+        ti._field_ctor_l.append((f.name, t.createField))        
+        pass
+    
+    def _processFieldPool(self, ti, f, attr, t):
+        ctor = Ctor.inst()
+        decl_size = -1
+        
+        pool_t = None
+        
+        if hasattr(t.T, "_typeinfo"):
+            print("Kind: %s" % str(t.T._typeinfo._kind))
+            pool_t = t.T._typeinfo.lib_obj
+        else:
+            raise Exception("Type %s is not a PyRctGen type" % t.T.__qualname__)
+        
+        if f.default is not dataclasses.MISSING:
+            if t.T._typeinfo._kind != StructKindE.Resource:
+                raise Exception("Only resource pools may be given a size. Pool %s is of kind %s" % (
+                    f.name, t.T._typeinfo._kind))
+            decl_size = int(f.default)
+        
+        field_t = ctor.ctxt().mkTypeFieldPool(
+            f.name,
+            pool_t,
+            attr,
+            decl_size)
+
+        ti.lib_obj.addField(field_t)
+        ti._field_ctor_l.append((f.name, t.createField))
+        
+    def _processFieldScalar(self, ti, f, attr, t):
+        ctor = Ctor.inst()
+        lt = ctor.ctxt().findDataTypeInt(t.S, t.W)
+        if lt is None:
+            lt = ctor.ctxt().mkDataTypeInt(t.S, t.W)
+            ctor.ctxt().addDataTypeInt(lt)
+
+        iv_m = None
+        
+        if f.default is not dataclasses.MISSING:
+            iv_m = ctor.ctxt().mkModelVal()
+            iv_m.setBits(t.W)
+            if t.S:
+                iv_m.set_val_i(int(f.default))
+            else:
+                iv_m.set_val_u(int(f.default))
+            
+        field_t = ctor.ctxt().mkTypeField(
+            f.name, 
+            lt, 
+            attr,
+            iv_m)
+        ti.lib_obj.addField(field_t)
+        ti._field_ctor_l.append((f.name, t.createField))        
     
     def _populateExecs(self, ti, T):
         T_ti = T._typeinfo

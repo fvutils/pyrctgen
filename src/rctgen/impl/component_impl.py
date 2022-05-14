@@ -31,7 +31,7 @@ class ComponentImpl(ImplBase):
                 action = action_field.getFieldData()
                 await action._evalExecTarget(ExecKindE.Body)
             
-                print("Action: %s" % str(action))
+#                print("Action: %s" % str(action))
             elif it.type() == core.ModelEvalNodeT.Parallel:
                 # Create a coroutine for each branch
                 # Wait for coroutines to complete

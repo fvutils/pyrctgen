@@ -20,7 +20,8 @@ class PoolT(FieldPoolImpl):
         s : CtorScope = ctor.scope()
         ret = FieldPoolImpl(
             name,
-            s.lib_scope)
+            s.lib_scope,
+            cls.T._typeinfo)
         
         return ret
 
