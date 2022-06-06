@@ -11,6 +11,7 @@ class Ctor(object):
     _inst = None
     
     def __init__(self):
+        self._is_elab = False
         self._component_type_m = {}
         self._exec_type_l = []
         self._ctxt = core.Arl.inst().mkContext()
@@ -23,13 +24,22 @@ class Ctor(object):
         self._expr_s = []
         self._expr_mode_s = []
  
-        self._component_typeinfo_m = {}
+        self._component_l = []
         self._action_typeinfo_m = {}       
 
         pass
     
     def ctxt(self):
         return self._ctxt
+    
+    def elab(self):
+        if self._is_elab:
+            return
+        
+        for c in self._component_l:
+            c._typeinfo.elab()
+        
+        self._is_elab = True
     
     def scope(self):
         if len(self._scope_s) > 0:
@@ -71,6 +81,11 @@ class Ctor(object):
     
     def push_action_decl(self, Ta):
         self._action_decl_l.append(Ta)
+        
+    def pop_action_decl(self):
+        ret = self._action_decl_l.copy()
+        self._action_decl_l.clear()
+        return ret
     
     def push_activity_decl(self, a):
         self._activity_l.append(a)
@@ -125,8 +140,11 @@ class Ctor(object):
         self._exec_type_l.clear()
         return ret
     
-    def add_component_typeinfo(self, T, typeinfo):
-        self._component_typeinfo_m[T] = typeinfo
+    def add_component(self, T):
+        self._component_l.append(T)
+        
+    def components(self):
+        return self._component_l
         
     def add_action_typeinfo(self, T, typeinfo):
         self._action_typeinfo_m[T] = typeinfo

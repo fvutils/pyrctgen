@@ -7,6 +7,8 @@ from test_base import TestBase
 from libarl import core
 import asyncio
 import rctgen as rg
+from rctgen.impl.ctor import Ctor
+import dataclasses
 
 functions = []
 def presolve(T):
@@ -119,9 +121,6 @@ class TestActionSmoke(TestBase):
                     print("")
                 with rg.parallel(label="foo"):
                     print("other")
-            
-            
-            pass
 
         root = MyComponent()
         root.eval(my_action2)
@@ -130,30 +129,75 @@ class TestActionSmoke(TestBase):
         a.activity()
         
     def test_activity_basics(self):
+
+#         def cg(T):
+#             print("cg")
+#             T.A : int = 1
+#             Tp = dataclasses.dataclass(T, init=False)
+#
+#             for f in dataclasses.fields(Tp):
+#                 print("Field: %s" % f.name)
+#                 if f.default is not dataclasses.MISSING:
+# #                    f.default()
+#                     pass
+#             return Tp
+#
+#         def init():
+#             print("init")
+#             return None
+#
+#         def wrap(o):
+#             pass
+#
+#         def coverpoint(t):
+#             print("Target: %s" % str(t))
+#             return 0
+#
+#         def cross(*args):
+#             pass
+#
+#         @cg
+#         class foo:
+#             A : int = lambda: coverpoint(0).body(
+#                 iff(2),
+#                 bins={
+#                     }
+#                 ).iff(2<10).bins({
+#                     a : bin(20)
+#                     })
+#             F : int = lambda: coverpoint(A)
+#             G : int = lambda: coverpoint(F)
+#             FxG : cross = lambda: cross(A,F).iff(F+G < 10).options(
+#                                    options())
         
         @rg.component
         class MyComponent(object):
-            pass
         
-        @rg.action(MyComponent)
-        class SayHello(object):
+            @rg.action
+            class SayHello(object):
             
-            @rg.exec.body
-            async def body(self):
-                print("Hello")
+                val : rg.rand_uint16_t
+            
+                @rg.exec.body
+                async def body(self):
+                    print("Hello %d" % self.val)
         
-        @rg.action(MyComponent)
-        class MyAction(object):
+            @rg.action
+            class MyAction(object):
             
-            @rg.activity
-            def activity(self):
-                rg.do[SayHello]
-                with rg.do_with[SayHello] as it:
-                    pass
-                    
-                pass
+                @rg.activity
+                def activity(self):
+                    rg.do[MyComponent.SayHello]
+                    with rg.do_with[MyComponent.SayHello] as it:
+                        pass
+        
+#        ctor = Ctor.inst()
+#        ctor.elab()
+        
+        root_comp = MyComponent()
+        asyncio.run(root_comp.eval(MyComponent.MyAction))                
             
-        a = MyAction()
-        a.activity()
+#        a = MyAction()
+#        a.activity()
             
         

@@ -20,13 +20,14 @@ class ActionImpl(ImplBase):
             if s.facade_obj is None:
                 # The field-based caller has created a frame for us
                 s.facade_obj = self
-                s.lib_scope.setFieldData(self)
+                if not ctor.is_type_mode():
+                    s.lib_scope.setFieldData(self)
             elif s.facade_obj is self:
                 s.inc_inh_depth()
             else:
                 # Need to create a new scope
-                if s._type_mode:
-                    raise Exception("Should hit in type mode")
+                if ctor.is_type_mode():
+                    raise Exception("Should not hit in type mode")
                 s = ctor.push_scope(
                     self,
                     ctor.ctxt().buildModelAction(
@@ -36,6 +37,8 @@ class ActionImpl(ImplBase):
                 s.lib_scope.setFieldData(self)
         else:
             # Push a new scope, knowing that we're not in type mode
+            if ctor.is_type_mode():
+                raise Exception("Should not hit in type mode")
             s = ctor.push_scope(
                 self,
                 ctor.ctxt().buildModelAction(
@@ -43,8 +46,7 @@ class ActionImpl(ImplBase):
                     type(self).__name__),
                 False)
             s.lib_scope.setFieldData(self)
-            
-        print("field_data: %s" % str(s.lib_scope.getFieldData()))
+
         
         self._modelinfo = ModelInfo(self, "<>")
         self._modelinfo._lib_obj = s._lib_scope
@@ -54,12 +56,17 @@ class ActionImpl(ImplBase):
         # Add built-in 'comp' field
         
         # Populate the fields
+        # Note: cannot ask for the object representation from DataClasses
+        # before this step is performed
         for i,fc in enumerate(typeinfo._field_ctor_l):
-            print("Field: %s" % fc[0])
+            print("Action Field: %s" % fc[0])
             ctor.push_scope(None, s.lib_scope.getField(i), False)
             field_facade = fc[1](fc[0])
             setattr(self, fc[0], field_facade)
             ctor.pop_scope()
+
+        if not ctor.is_type_mode():            
+            print("field_data: %s" % str(s.lib_scope.getFieldData()))
             
 
         # Invoke the user-visible constructor        

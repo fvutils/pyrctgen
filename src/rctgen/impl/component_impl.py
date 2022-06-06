@@ -31,19 +31,25 @@ class ComponentImpl(ImplBase):
                 action = action_field.getFieldData()
                 await action._evalExecTarget(ExecKindE.Body)
             
-#                print("Action: %s" % str(action))
+                print("Action: %s" % str(action))
             elif it.type() == core.ModelEvalNodeT.Parallel:
                 # Create a coroutine for each branch
                 # Wait for coroutines to complete
+                print("TODO: evaluate parallel")
                 pass
             elif it.type() == core.ModelEvalNodeT.Sequence:
                 # Iterate through each item and dispatch
+                print("TODO: evaluate sequence")
                 pass
             print("type: %s" % str(it.type()))
         
     @staticmethod
     def init(self, base, *args, **kwargs):
         ctor = Ctor.inst()
+
+        # Elaborate just in case we haven't already        
+        ctor.elab()
+        
         typeinfo = type(self)._typeinfo
         
         s = ctor.scope()

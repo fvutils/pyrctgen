@@ -22,17 +22,13 @@ class DecoratorImplBase(object):
         self._kind = kind
         self._supports_constraints = True
     
-    def populate_execs(self, ti : TypeInfo, supported_s):
-                
-        return None
-                
     def __call__(self, T):
         ctor = Ctor.inst()
 
         Tp = dataclasses.dataclass(T, init=False)
 
         ds_t = self._mkLibDataType(T, T.__qualname__, ctor.ctxt())
-        ti = self._mkTypeInfo(self._kind)
+        ti = self._mkTypeInfo(Tp, self._kind)
         
         setattr(T, "_typeinfo", ti)
         ti.lib_obj = ds_t
@@ -61,7 +57,6 @@ class DecoratorImplBase(object):
         execs = Ctor.inst().pop_exec_types()
         
         for e in execs:
-            print("Exec: %s" % str(e.kind))
             if not self._validateExec(e.kind):
                 raise Exception("Unsupported exec kind %s" % str(e.kind))
             if e.kind not in ti._exec_m.keys():
@@ -77,14 +72,20 @@ class DecoratorImplBase(object):
         
         return Tp
     
+    def elaborateType(self):
+        pass
+    
+    def _elaborateConstraints(self):
+        pass
+    
     def _validateExec(self, kind):
         return True
     
     def _validateField(self, name, type, is_rand):
         return True
     
-    def _mkTypeInfo(self, kind : TypeKindE):
-        return TypeInfo(kind)
+    def _mkTypeInfo(self, Tp, kind : TypeKindE):
+        return TypeInfo(Tp, kind)
     
     def _mkLibDataType(self, T, name, ctxt):
         raise NotImplementedError("_mkLibDataType not implemented for %s" % str(type(self)))
@@ -196,7 +197,7 @@ class DecoratorImplBase(object):
             else:
                 iv_m.set_val_u(int(f.default))
             
-        field_t = ctor.ctxt().mkTypeField(
+        field_t = ctor.ctxt().mkTypeFieldPhy(
             f.name, 
             lt, 
             attr,

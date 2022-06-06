@@ -6,10 +6,10 @@ Created on May 8, 2022
 
 class ActivityDecl(object):
     
-    def __init__(self, activity_f):
-        self._activity_f = activity_f
+    def __init__(self, func):
+        self._func = func
         
     @property
-    def activity_f(self):
-        return self._activity_f
+    def func(self):
+        return self._func
     

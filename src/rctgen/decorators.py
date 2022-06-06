@@ -11,15 +11,12 @@ from rctgen.impl.struct_kind_e import StructKindE
 from rctgen.impl.component_decorator_impl import ComponentDecoratorImpl
 from rctgen.impl.activity_decorator_impl import ActivityDecoratorImpl
 from rctgen.impl.type_kind_e import TypeKindE
+from rctgen.impl.constraint_decorator_impl import ConstraintDecoratorImpl
 
 def action(*args, **kwargs): 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        if hasattr(args[0], "_typeinfo") and args[0]._typeinfo.kind == TypeKindE.Component:
-            # Argument form with the parameter being the context class
-            return ActionDecoratorImpl(args, kwargs)
-        else:
-            # No-argument form
-            return ActionDecoratorImpl([], {})(args[0])
+        # No-argument form
+        return ActionDecoratorImpl([], {})(args[0])
     else:
         # Argument form
         return ActionDecoratorImpl(args, kwargs)
@@ -38,6 +35,13 @@ def component(*args, **kwargs):
     else:
         return ComponentDecoratorImpl(kwargs)
     
+def constraint(*args, **kwargs):
+    if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+        # No-argument form
+        return ConstraintDecoratorImpl({})(args[0])
+    else:
+        return ConstraintDecoratorImpl(kwargs)
+
 def buffer(*args, **kwargs): 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
         # No-argument form
@@ -113,4 +117,16 @@ class exec(object):
             return ExecDecoratorImpl(ExecKindE.PostSolve, {})(args[0])
         else:
             return ExecDecoratorImpl(ExecKindE.PostSolve, kwargs)
+        
+class extern(object):
+
+    # TODO:    
+    @staticmethod
+    def action(*args, **kwargs):
+        raise NotImplementedError("extern.action not implemented")
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            # No-argument form
+            return ExecDecoratorImpl(ExecKindE.PreSolve, {})(args[0])
+        else:
+            return ExecDecoratorImpl(ExecKindE.PreSolve, kwargs)
     

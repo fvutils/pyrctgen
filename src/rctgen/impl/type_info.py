@@ -6,10 +6,16 @@ Created on Apr 4, 2022
 from typing import Dict, List, Tuple
 from rctgen.impl.exec_kind_e import ExecKindE
 from rctgen.impl.exec_group import ExecGroup
+from rctgen.impl.constraint_impl import ConstraintImpl
 
 class TypeInfo(object):
     
-    def __init__(self, kind):
+    def __init__(self, Tp, kind):
+        
+        self._Tp = Tp
+        
+        self._is_elab = False
+        
         self._kind = kind
         
         self._lib_obj = None
@@ -21,9 +27,9 @@ class TypeInfo(object):
         self._exec_m : Dict[ExecKindE,ExecGroup] = {}
         
         # List of constraints
-        self._constraint_l = []
+        self._constraint_l : List[ConstraintImpl] = []
         
-        # Dict
+        # List of field-name, field-constructor
         self._field_ctor_l : Tuple[str,object] = []
         
     @property
@@ -49,3 +55,11 @@ class TypeInfo(object):
     @ctxt_t.setter
     def ctxt_t(self, _ctxt_t):
         self._ctxt_t = _ctxt_t
+        
+    @property
+    def is_elab(self):
+        return self._is_elab
+    
+    def elab(self):
+        raise NotImplementedError("elab not implemented for type %s" % str(type(self)))
+        self._is_elab = True

@@ -24,45 +24,41 @@ class ActionDecoratorImpl(DecoratorImplBase):
         
         ActionImpl.addMethods(T)
 
-        component_t = None        
-        if len(self._args) != 0:
-            if not hasattr(self._args[0], "_typeinfo"):
-                raise Exception("Type %s is not a RctGen type" % str(self._args[0]))
-            if self._args[0]._typeinfo.kind != TypeKindE.Component:
-                raise Exception("Type %s is of kind %s, not Component" % (
-                    self._args[0].__qualname__, str(self._args[0]._typeinfo.kind)))
-            component_t = self._args[0]
-        elif "component" in self._kwargs.keys():
-            ctxt_t = self._kwargs["component"]
-            if not hasattr(ctxt_t, "_typeinfo"):
-                raise Exception("Type %s is not a RctGen type" % str(ctxt_t))
-            if ctxt_t._typeinfo.kind != TypeKindE.Component:
-                raise Exception("Type %s is of kind %s, not Component" % (
-                    ctxt_t.__qualname__, str(ctxt_t._typeinfo.kind)))
-            component_t = ctxt_t
-        else:
-            print("Abstract action")
+        # component_t = None        
+        # if len(self._args) != 0:
+        #     if not hasattr(self._args[0], "_typeinfo"):
+        #         raise Exception("Type %s is not a RctGen type" % str(self._args[0]))
+        #     if self._args[0]._typeinfo.kind != TypeKindE.Component:
+        #         raise Exception("Type %s is of kind %s, not Component" % (
+        #             self._args[0].__qualname__, str(self._args[0]._typeinfo.kind)))
+        #     component_t = self._args[0]
+        # elif "component" in self._kwargs.keys():
+        #     ctxt_t = self._kwargs["component"]
+        #     if not hasattr(ctxt_t, "_typeinfo"):
+        #         raise Exception("Type %s is not a RctGen type" % str(ctxt_t))
+        #     if ctxt_t._typeinfo.kind != TypeKindE.Component:
+        #         raise Exception("Type %s is of kind %s, not Component" % (
+        #             ctxt_t.__qualname__, str(ctxt_t._typeinfo.kind)))
+        #     component_t = ctxt_t
+        # else:
+        #     print("Abstract action")
             
         Tp = super().__call__(T)
             
-        self.populate_execs(
-            Tp._typeinfo,
-            (ExecKindE.PreSolve, ExecKindE.PostSolve, ExecKindE.Body))
-        
         for a in ctor.pop_activity_decl():
             Tp._typeinfo.addActivityDecl(a)
+            
+        # Before leaving, elaborate the activities
+#        for a in Tp._typeinfo._activ:
+#            pass
         
-#        self.populate_activities(Tp._typeinfo)
-        
-        # Build out the type model associated with this type
-
-#        ctor.push_action_decl(Tp)
-        Ctor.inst().add_action_typeinfo(Tp, Tp._typeinfo)
+        ctor.push_action_decl(Tp)
+#        Ctor.inst().add_action_typeinfo(Tp, Tp._typeinfo)
         
         return Tp
     
-    def _mkTypeInfo(self, kind : TypeKindE):
-        return TypeInfoAction()
+    def _mkTypeInfo(self, Tp, kind : TypeKindE):
+        return TypeInfoAction(Tp)
    
     def _mkLibDataType(self, T, name, ctxt):
         ds_t = ctxt.findDataTypeAction(name)
@@ -71,4 +67,4 @@ class ActionDecoratorImpl(DecoratorImplBase):
             ds_t.setCreateHook(lambda obj: ActionImpl._createHook(T, obj))
             ctxt.addDataTypeAction(ds_t)
         return ds_t
-    
+
