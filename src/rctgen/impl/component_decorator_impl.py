@@ -10,6 +10,7 @@ from rctgen.impl.component_impl import ComponentImpl
 from rctgen.impl.exec_kind_e import ExecKindE
 from rctgen.impl.ctor import Ctor
 from rctgen.impl.type_info_component import TypeInfoComponent
+import typing
 
 
 class ComponentDecoratorImpl(DecoratorImplBase):
@@ -25,7 +26,10 @@ class ComponentDecoratorImpl(DecoratorImplBase):
         ComponentImpl.addMethods(T)
         
         for a in ctor.pop_action_decl():
-            print("Have Action")
+#            print("Have Action: locals=%s ; globals=%s" % (str(locals()), str(globals())))
+            
+#            hints = typing.get_type_hints(a, locals(), globals())
+#            print("hints: %s" % str(hints))
             
             a._typeinfo._component_t = Tp
             a._typeinfo._lib_obj.setComponentType(Tp._typeinfo._lib_obj)

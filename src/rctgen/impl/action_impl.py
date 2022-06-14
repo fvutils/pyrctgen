@@ -60,7 +60,7 @@ class ActionImpl(ImplBase):
         # before this step is performed
         for i,fc in enumerate(typeinfo._field_ctor_l):
             print("Action Field: %s" % fc[0])
-            ctor.push_scope(None, s.lib_scope.getField(i), False)
+            ctor.push_scope(None, s.lib_scope.getField(i))
             field_facade = fc[1](fc[0])
             setattr(self, fc[0], field_facade)
             ctor.pop_scope()
@@ -81,7 +81,11 @@ class ActionImpl(ImplBase):
         ctor.push_scope(None, hndl, False)
         inst = cls()
         ctor.pop_scope()
-    
+        
+    @staticmethod
+    def _createInst(cls, name):
+        ret = cls()
+        return ret
     
     @classmethod
     def addMethods(cls, T):
@@ -90,4 +94,5 @@ class ActionImpl(ImplBase):
         setattr(T, "__super_init__", getattr(T, "__init__"))
         setattr(T, "__init__", lambda self, *args, **kwargs: cls.init(
             self, base_init, *args, **kwargs))
+        setattr(T, "_createInst", cls._createInst)
 

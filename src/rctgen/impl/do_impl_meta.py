@@ -19,6 +19,7 @@ class DoImplMeta(type):
         field_t = ctor.ctxt().mkTypeFieldPhy(
             "__tmp__",
             item._typeinfo._lib_obj,
+            False,
             vsc.TypeFieldAttr.NoAttr,
             None)
         

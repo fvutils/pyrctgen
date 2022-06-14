@@ -33,8 +33,6 @@ class DecoratorImplBase(object):
         setattr(T, "_typeinfo", ti)
         ti.lib_obj = ds_t
         
-        self._populateFields(ti, Tp)
-
         #************************************************************        
         #* Populate constraints from this type and base types
         #************************************************************        
@@ -72,12 +70,6 @@ class DecoratorImplBase(object):
         
         return Tp
     
-    def elaborateType(self):
-        pass
-    
-    def _elaborateConstraints(self):
-        pass
-    
     def _validateExec(self, kind):
         return True
     
@@ -91,119 +83,7 @@ class DecoratorImplBase(object):
         raise NotImplementedError("_mkLibDataType not implemented for %s" % str(type(self)))
     
     def _populateFields(self, ti : TypeInfo, T):
-        for f in dataclasses.fields(T):
-
-            attr = vsc.ModelFieldFlag.NoFlags
-            is_rand = False
-            iv=0
-            t = f.type
-            if issubclass(t, RandT):
-                t = t.T
-                attr |= vsc.ModelFieldFlag.DeclRand
-                is_rand = True
-
-            ctor = Ctor.inst()
-
-            print("f: %s" % str(f))
-            
-            # The signature of a creation function is:
-            # - name
-            # - is_rand
-            # - idx
-            if issubclass(t, ScalarT):
-                self._processFieldScalar(ti, f, attr, t)
-            elif issubclass(t, PoolT):
-                self._processFieldPool(ti, f, attr, t)
-            elif issubclass(t, LockShareT):
-                print("LockShare!")
-                self._processFieldLockShare(ti, f, attr, t)
-            elif hasattr(t, "_typeinfo") and isinstance(t._typeinfo, TypeInfo):
-                # This is a field of user-defined type
-                print("Has TypeInfo")
-                field_t = ctor.ctxt().mkTypeField(
-                    f.name, 
-                    t._typeinfo.lib_obj, 
-                    attr,
-                    None)
-                ti.lib_obj.addField(field_t)
-                ti._field_ctor_l.append((f.name, lambda name, t=t: t._createInst(t, name)))
-                
-            print("Field: %s" % str(f))
         pass
-    
-    def _processFieldLockShare(self, ti, f, attr, t):
-        ctor = Ctor.inst()
-        
-        if hasattr(t.T, "_typeinfo"):
-            print("Kind: %s" % str(t.T._typeinfo._kind))
-            claim_t = t.T._typeinfo.lib_obj
-        else:
-            raise Exception("Type %s is not a PyRctGen type" % t.T.__qualname__)
-        
-        if f.default is not dataclasses.MISSING:
-            print("default: %s" % str(f.default))
-            raise Exception("Lock/Share fields cannot be assigned a value")
-        
-        field_t = ctor.ctxt().mkTypeFieldClaim(
-            f.name,
-            claim_t,
-            t.IsLock)
-
-        ti.lib_obj.addField(field_t)
-        ti._field_ctor_l.append((f.name, t.createField))        
-        pass
-    
-    def _processFieldPool(self, ti, f, attr, t):
-        ctor = Ctor.inst()
-        decl_size = -1
-        
-        pool_t = None
-        
-        if hasattr(t.T, "_typeinfo"):
-            print("Kind: %s" % str(t.T._typeinfo._kind))
-            pool_t = t.T._typeinfo.lib_obj
-        else:
-            raise Exception("Type %s is not a PyRctGen type" % t.T.__qualname__)
-        
-        if f.default is not dataclasses.MISSING:
-            if t.T._typeinfo._kind != StructKindE.Resource:
-                raise Exception("Only resource pools may be given a size. Pool %s is of kind %s" % (
-                    f.name, t.T._typeinfo._kind))
-            decl_size = int(f.default)
-        
-        field_t = ctor.ctxt().mkTypeFieldPool(
-            f.name,
-            pool_t,
-            attr,
-            decl_size)
-
-        ti.lib_obj.addField(field_t)
-        ti._field_ctor_l.append((f.name, t.createField))
-        
-    def _processFieldScalar(self, ti, f, attr, t):
-        ctor = Ctor.inst()
-        lt = ctor.ctxt().findDataTypeInt(t.S, t.W)
-        if lt is None:
-            lt = ctor.ctxt().mkDataTypeInt(t.S, t.W)
-            ctor.ctxt().addDataTypeInt(lt)
-
-        iv_m = None
-        
-        if f.default is not dataclasses.MISSING:
-            iv_m = ctor.ctxt().mkModelVal()
-            iv_m.setBits(t.W)
-            if t.S:
-                iv_m.set_val_i(int(f.default))
-            else:
-                iv_m.set_val_u(int(f.default))
-            
-        field_t = ctor.ctxt().mkTypeFieldPhy(
-            f.name, 
-            lt, 
-            attr,
-            iv_m)
-        ti.lib_obj.addField(field_t)
-        ti._field_ctor_l.append((f.name, t.createField))        
     
     def _populateExecs(self, ti, T):
         T_ti = T._typeinfo

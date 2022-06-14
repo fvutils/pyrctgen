@@ -47,7 +47,11 @@ class Ctor(object):
         else:
             return None
         
-    def push_scope(self, facade_obj, lib_scope, type_mode):
+    def push_scope(self, facade_obj, lib_scope, type_mode=None):
+        if type_mode is None:
+            if len(self._scope_s) == 0:
+                raise Exception("Cannot pass type_mode=None without a scope entry")
+            type_mode = self._scope_s[-1]._type_mode
         s = CtorScope(facade_obj, lib_scope, type_mode)
         self._scope_s.append(s)
         return s

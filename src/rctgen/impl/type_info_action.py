@@ -6,6 +6,7 @@ Created on May 8, 2022
 from rctgen.impl.type_info import TypeInfo
 from rctgen.impl.type_kind_e import TypeKindE
 from rctgen.impl.ctor import Ctor
+import typing
 
 class TypeInfoAction(TypeInfo):
     
@@ -23,6 +24,8 @@ class TypeInfoAction(TypeInfo):
         
         ctor = Ctor.inst()
         
+        self._elabFields()
+
         # Build out a type model
         at = ctor.ctxt().mkDataTypeAction(self._Tp.__qualname__)
         ctor.push_scope(None, at, True)
