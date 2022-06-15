@@ -39,7 +39,7 @@ class DecoratorImplBase(object):
         constraints = Ctor.inst().pop_constraint_decl()
         constraint_s = set()
         for c in constraints:
-            constraint_s.add(c._name)
+            constraint_s.add(c.name)
             ti._constraint_l.append(c)
             
         for b in T.__bases__:

@@ -11,9 +11,6 @@ package:
     deps:
     - name: dataclasses
       src: pypi
-    - name: pyvsc
-      url: https://github.com/fvutils/pyvsc.git
-      branch: vsc2
     - name: libvsc
       url: https://github.com/fvutils/libvsc.git
     - name: libarl

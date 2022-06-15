@@ -8,7 +8,7 @@ from rctgen.impl.ctor import Ctor
 
 class ConstraintDecoratorImpl(object):
     
-    def __init__(self, **kwargs):
+    def __init__(self, kwargs):
         pass
     
     def __call__(self, T):

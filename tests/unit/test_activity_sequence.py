@@ -6,6 +6,7 @@ Created on Jun 12, 2022
 import rctgen as rg
 from test_base import TestBase
 from rctgen.impl.ctor import Ctor
+import asyncio
 
 class TestActivitySequence(TestBase):
     
@@ -16,6 +17,9 @@ class TestActivitySequence(TestBase):
             
             @rg.action
             class A(object):
+                @rg.constraint
+                def my_c(self):
+                    pass
                 pass
             
             @rg.action
@@ -31,8 +35,9 @@ class TestActivitySequence(TestBase):
                 def activity(self):
                     rg.do[Top.A]
                     rg.do[Top.B]
-                    
-        Ctor.inst().elab()
+
+        top = Top()
+        asyncio.run(top.eval(Top.Entry))
         
         
 

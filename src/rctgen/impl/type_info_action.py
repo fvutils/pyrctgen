@@ -26,19 +26,27 @@ class TypeInfoAction(TypeInfo):
         
         self._elabFields()
 
-        # Build out a type model
-        at = ctor.ctxt().mkDataTypeAction(self._Tp.__qualname__)
-        ctor.push_scope(None, at, True)
+        ctor.push_scope(None, self.lib_obj, True)
         obj = self._Tp()
         
         # Elaboate constraints
         ctor.push_expr_mode()
         for c in self._constraint_l:
+            constraint = ctor.ctxt().mkTypeConstraintBlock(c.name)
+            ctor.push_constraint_scope(constraint)
             c.func(obj)
-            
-        for a in self._activity_decl_l:
-            a.func(obj)
+            ctor.pop_constraint_scope()
+            self.lib_obj.addConstraint(constraint)
 
+        for a in self._activity_decl_l:
+            activity = ctor.ctxt().mkDataTypeActivitySequence()
+            ctor.push_activity_scope(activity)
+            print("--> activity")
+            a.func(obj)
+            print("<-- activity")
+            ctor.pop_activity_scope()
+            self.lib_obj.addActivity(activity)
+            
         ctor.pop_expr_mode()        
         ctor.pop_scope()
                 

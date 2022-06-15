@@ -26,6 +26,7 @@ class Ctor(object):
  
         self._component_l = []
         self._action_typeinfo_m = {}       
+        self._activity_s = []
 
         pass
     
@@ -100,14 +101,14 @@ class Ctor(object):
         return ret
     
     def push_activity_scope(self, s):
-        pass
+        self._activity_s.append(s)
     
     def pop_activity_scope(self):
-        pass
-    
-    def add_activity_item(self, it):
-        pass
+        self._activity_s.pop()
         
+    def activity_scope(self):
+        return self._activity_s[-1]
+    
     def push_constraint_decl(self, c):
         self._constraint_l.append(c)
         
