@@ -6,6 +6,7 @@ Created on Apr 4, 2022
 from rctgen.impl.impl_base import ImplBase
 from rctgen.impl.ctor import Ctor
 from rctgen.impl.model_info import ModelInfo
+from rctgen.impl.activity_traverse_closure import ActivityTraverseClosure
 
 class ActionImpl(ImplBase):
     
@@ -75,6 +76,36 @@ class ActionImpl(ImplBase):
         pass
     
     @staticmethod
+    def getattribute(self, name):
+        ctor = Ctor.inst()
+        ret = object.__getattribute__(self, name)
+
+        if ctor.activity_mode():
+            # Need to get the path of the target field
+            ctor.push_activity_mode(False)
+            ctor.push_expr_mode(False)
+            target = ctor.ctxt().mkTypeExprFieldRef()
+            target.addRootRef()
+            target.addIdxRef(ret._modelinfo._lib_obj.getIndex())
+            print("Field: %d" % ret._modelinfo._lib_obj.getIndex())
+            dt_traverse = ctor.ctxt().mkDataTypeActivityTraverse(
+                target,
+                None)
+
+            ctor.activity_scope().addActivity(dt_traverse)            
+            ret = ActivityTraverseClosure(dt_traverse)
+            
+            print("TODO: Add an activity")
+            ctor.pop_expr_mode()
+            ctor.pop_activity_mode()
+        elif not ctor.expr_mode():
+            # TODO: Check whether this is a 'special' field
+            if hasattr(ret, "get_val"):
+                ret = ret.get_val()
+        
+        return ret    
+    
+    @staticmethod
     def _createHook(cls, hndl):
         print("createHook")
         ctor = Ctor.inst()
@@ -95,4 +126,4 @@ class ActionImpl(ImplBase):
         setattr(T, "__init__", lambda self, *args, **kwargs: cls.init(
             self, base_init, *args, **kwargs))
         setattr(T, "_createInst", cls._createInst)
-
+        setattr(T, "__getattribute__", cls.getattribute)

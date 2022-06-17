@@ -5,6 +5,7 @@ Created on Apr 30, 2022
 '''
 from rctgen.impl.ctor import Ctor
 import libvsc.core as vsc
+from rctgen.impl.activity_traverse_closure import ActivityTraverseClosure
 
 class DoImplMeta(type):
 
@@ -15,7 +16,7 @@ class DoImplMeta(type):
         ctor = Ctor.inst()
         print("DoImplMeta: %s" % str(item._typeinfo._lib_obj))
         
-        # Add a field declaration to the action
+        # Add a field declaration to the activity scope
         field_t = ctor.ctxt().mkTypeFieldPhy(
             "__tmp__",
             item._typeinfo._lib_obj,
@@ -23,6 +24,18 @@ class DoImplMeta(type):
             vsc.TypeFieldAttr.NoAttr,
             None)
         
+        ctor.activity_scope().addField(field_t)
+
+        target = ctor.ctxt().mkTypeExprFieldRef()
+        target.addRootRef()
+        target.addIdxRef(field_t.getIndex())
+                
+        dt_traverse = ctor.ctxt().mkDataTypeActivityTraverse(
+            target,
+            None)
+        
+        ctor.activity_scope().addActivity(dt_traverse)
+        
         # Add a traversal statement to the current activity scope
-        pass
+        return ActivityTraverseClosure(dt_traverse)
     

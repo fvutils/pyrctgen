@@ -37,7 +37,9 @@ class TypeInfoAction(TypeInfo):
             c.func(obj)
             ctor.pop_constraint_scope()
             self.lib_obj.addConstraint(constraint)
+        ctor.pop_expr_mode()
 
+        ctor.push_activity_mode()
         for a in self._activity_decl_l:
             activity = ctor.ctxt().mkDataTypeActivitySequence()
             ctor.push_activity_scope(activity)
@@ -46,8 +48,8 @@ class TypeInfoAction(TypeInfo):
             print("<-- activity")
             ctor.pop_activity_scope()
             self.lib_obj.addActivity(activity)
+        ctor.pop_activity_mode()
             
-        ctor.pop_expr_mode()        
         ctor.pop_scope()
                 
         self._is_elab = True

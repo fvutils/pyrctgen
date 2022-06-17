@@ -34,7 +34,16 @@ class TestActivitySequence(TestBase):
                 @rg.activity
                 def activity(self):
                     rg.do[Top.A]
+                    with rg.do[Top.B]:
+                        pass
+                    
                     rg.do[Top.B]
+                   
+                    # Could probably handle via a special-purpose __getattribute__
+                    self.a()
+                    
+                    with self.b(1,2,3):
+                        pass
 
         top = Top()
         asyncio.run(top.eval(Top.Entry))

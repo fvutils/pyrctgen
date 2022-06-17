@@ -23,6 +23,7 @@ class Ctor(object):
         self._constraint_s = []
         self._expr_s = []
         self._expr_mode_s = []
+        self._activity_mode_s = []
  
         self._component_l = []
         self._action_typeinfo_m = {}       
@@ -74,6 +75,15 @@ class Ctor(object):
             return self._expr_s[-1]
         else:
             return None
+        
+    def activity_mode(self):
+        return len(self._activity_mode_s) > 0 and self._activity_mode_s[-1]
+    
+    def push_activity_mode(self, m=True):
+        self._activity_mode_s.append(m)
+        
+    def pop_activity_mode(self):
+        return self._activity_mode_s.pop()
         
     def push_expr_mode(self, m=True):
         self._expr_mode_s.append(m)
