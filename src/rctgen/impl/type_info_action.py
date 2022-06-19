@@ -41,13 +41,19 @@ class TypeInfoAction(TypeInfo):
 
         ctor.push_activity_mode()
         for a in self._activity_decl_l:
-            activity = ctor.ctxt().mkDataTypeActivitySequence()
-            ctor.push_activity_scope(activity)
+            activity_s = ctor.ctxt().mkDataTypeActivitySequence()
+            activity_f = ctor.ctxt().mkTypeFieldActivity(
+                    "activity",
+                    activity_s,
+                    True)
+            self.lib_obj.addActivity(activity_f)
+            print("activity index=%d" % activity_f.getIndex())
+            
+            ctor.push_activity_scope(activity_s)
             print("--> activity")
             a.func(obj)
             print("<-- activity")
             ctor.pop_activity_scope()
-            self.lib_obj.addActivity(activity)
         ctor.pop_activity_mode()
             
         ctor.pop_scope()

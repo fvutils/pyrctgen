@@ -40,10 +40,10 @@ class TestActivitySequence(TestBase):
                     rg.do[Top.B]
                    
                     # Could probably handle via a special-purpose __getattribute__
-                    self.a()
+#                    self.a()
                     
-                    with self.b(1,2,3):
-                        pass
+#                    with self.b(1,2,3):
+#                        pass
 
         top = Top()
         asyncio.run(top.eval(Top.Entry))

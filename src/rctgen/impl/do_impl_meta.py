@@ -27,14 +27,18 @@ class DoImplMeta(type):
         ctor.activity_scope().addField(field_t)
 
         target = ctor.ctxt().mkTypeExprFieldRef()
-        target.addRootRef()
+        target.addActiveScopeRef(-1)
         target.addIdxRef(field_t.getIndex())
-                
+
         dt_traverse = ctor.ctxt().mkDataTypeActivityTraverse(
             target,
             None)
+        ft_traverse = ctor.ctxt().mkTypeFieldActivity(
+            "",
+            dt_traverse,
+            True)
         
-        ctor.activity_scope().addActivity(dt_traverse)
+        ctor.activity_scope().addActivity(ft_traverse)
         
         # Add a traversal statement to the current activity scope
         return ActivityTraverseClosure(dt_traverse)
